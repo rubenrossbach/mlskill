@@ -22,8 +22,8 @@ if "index" not in st.session_state:
 # Display first question and answers
 st.write(df.iloc[st.session_state.index, 0])
 
-ans = tuple(df.iloc[st.session_state.index, 1:5])
-choice = st.radio("Choose one", ans)
+ans = df.iloc[st.session_state.index, 1:5]
+choice = st.radio("Choose one", ans, index=0)
 correct_choice = df.iloc[st.session_state.index, 5]
 
 sel = 0
@@ -36,9 +36,20 @@ elif choice == ans[2]:
 elif choice == ans[3]:
     sel = 4
 
-if sel == correct_choice:
-    st.write("Correct!")
-else:
-    st.write("wrong")
+col1, col2, col3 = st.columns(3)
+with col2:
+    if st.button("Check"):
+        if sel == correct_choice:
+            st.write("Correct!")
+        else:
+            st.write("wrong")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    if st.button("Back"):
+            st.session_state.index -= 1
+with col3:
+    if st.button("Continue"):
+            st.session_state.index += 1
 
 # Made by Ruben Rossbach, GH LI
