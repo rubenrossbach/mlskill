@@ -19,6 +19,21 @@ st.write("# Machine Learning Skill Test")
 if "index" not in st.session_state:
     st.session_state.index = 0
 
+# Controls
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.write("")
+    st.write("")
+    if st.button("Back"):
+            st.session_state.index -= 1
+with col2:
+    st.session_state.index = st.selectbox('Jump to question', df.index +1) - 1
+with col4:
+    st.write("")
+    st.write("")
+    if st.button("Continue"):
+            st.session_state.index += 1
+
 # Display first question and answers
 st.write(df.iloc[st.session_state.index, 0])
 
@@ -44,12 +59,5 @@ with col2:
         else:
             st.write("wrong")
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("Back"):
-            st.session_state.index -= 1
-with col3:
-    if st.button("Continue"):
-            st.session_state.index += 1
 
 # Made by Ruben Rossbach, GH LI
