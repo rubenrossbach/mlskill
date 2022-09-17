@@ -51,13 +51,22 @@ elif choice == ans[2]:
 elif choice == ans[3]:
     sel = 4
 
+# try centering instead of columns
 col1, col2, col3 = st.columns(3)
 with col2:
     if st.button("Check"):
         if sel == correct_choice:
-            st.write("Correct!")
+            st.success("Correct!")
         else:
-            st.write("wrong")
+            st.error("Wrong")
 
+
+# Add images
 
 # Made by Ruben Rossbach, GH LI
+
+# push to Heroku
+
+# Add display of right and wrong (green, red, grey, horizontal)
+
+# Add retry of failed tests
