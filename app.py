@@ -25,19 +25,29 @@ with col1:
     st.write("")
     st.write("")
     if st.button("Back"):
-            st.session_state.index -= 1
+        st.session_state.index -= 1
 with col2:
-    st.session_state.index = st.selectbox('Jump to question', df.index +1) - 1
+    jump = st.selectbox('Jump to question', df.index + 1)
+with col3:
+    st.write("")
+    st.write("")
+    if st.button("Go"):
+        st.session_state.index = jump - 1
 with col4:
     st.write("")
     st.write("")
     if st.button("Continue"):
-            st.session_state.index += 1
+        st.session_state.index += 1
 
-# Display first question and answers
+# Display question and answers
 st.write(df.iloc[st.session_state.index, 0])
 
-ans = df.iloc[st.session_state.index, 1:5]
+try:
+    st.image(df.iloc[st.session_state.index, 6])
+except:
+    pass
+
+ans = df.iloc[st.session_state.index, 1:5].dropna()
 choice = st.radio("Choose one", ans, index=0)
 correct_choice = df.iloc[st.session_state.index, 5]
 
@@ -51,7 +61,7 @@ elif choice == ans[2]:
 elif choice == ans[3]:
     sel = 4
 
-# try centering instead of columns
+# Check
 col1, col2, col3 = st.columns(3)
 with col2:
     if st.button("Check"):
@@ -60,8 +70,6 @@ with col2:
         else:
             st.error("Wrong")
 
-
-# Add images
 
 # Made by Ruben Rossbach, GH LI
 
