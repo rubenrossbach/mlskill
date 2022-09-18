@@ -62,16 +62,19 @@ elif choice == ans[3]:
     sel = 4
 
 # Check
-col1, col2, col3 = st.columns(3)
-with col2:
+cols = st.columns(6)
+with cols[2]:
     if st.button("Check"):
         if sel == correct_choice:
             st.success("Correct!")
         else:
             st.error("Wrong")
 
-
-# Made by Ruben Rossbach, GH LI
+st.write("")
+urlrLink = "[LinkedIn](https://www.linkedin.com/in/ruben-rossbach/)"
+urlrGH = "[Github](https://github.com/rubenrossbach)"
+st.write("Made by Ruben Rossbach")
+st.write(f"{urlrLink} | {urlrGH}")
 
 # push to Heroku
 
