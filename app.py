@@ -20,61 +20,69 @@ st.write("# Machine Learning Skill Test")
 if "index" not in st.session_state:
     st.session_state.index = 0
 if "correct" not in st.session_state:
-    st.session_state["correct"] = np.array([np.nan] * len(df))
+    st.session_state.correct = np.array([np.nan] * len(df))
+if "retry" not in st.session_state:
+    st.session_state.retry = False
 
-# Controls
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.write("")
-    st.write("")
-    if st.button("Back"):
-        st.session_state.index -= 1
-with col2:
-    jump = st.selectbox('Jump to question', df.index + 1)
-with col3:
-    st.write("")
-    st.write("")
-    if st.button("Go"):
-        st.session_state.index = jump - 1
-with col4:
-    st.write("")
-    st.write("")
-    if st.button("Continue"):
-        st.session_state.index += 1
+def quiz(df):
+    # Controls
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.write("")
+        st.write("")
+        if st.button("Back"):
+            st.session_state.index -= 1
+    with col2:
+        jump = st.selectbox('Jump to question', df.index + 1)
+    with col3:
+        st.write("")
+        st.write("")
+        if st.button("Go"):
+            st.session_state.index = jump - 1
+    with col4:
+        st.write("")
+        st.write("")
+        if st.button("Continue"):
+            st.session_state.index += 1
 
-# Display question and answers
-st.write(df.iloc[st.session_state.index, 0])
+    # Display question and answers
+    st.write(df.iloc[st.session_state.index, 0])
 
-try:
-    st.image(df.iloc[st.session_state.index, 6])
-except:
-    pass
+    try:
+        st.image(df.iloc[st.session_state.index, 6])
+    except:
+        pass
 
-ans = df.iloc[st.session_state.index, 1:5].dropna()
-choice = st.radio("Choose one", ans, index=0)
-correct_choice = df.iloc[st.session_state.index, 5]
+    ans = df.iloc[st.session_state.index, 1:5].dropna()
+    choice = st.radio("Choose one", ans, index=0)
+    correct_choice = df.iloc[st.session_state.index, 5]
 
-sel = 0
-if choice == ans[0]:
-    sel = 1
-elif choice == ans[1]:
-    sel = 2
-elif choice == ans[2]:
-    sel = 3
-elif choice == ans[3]:
-    sel = 4
+    sel = 0
+    if choice == ans[0]:
+        sel = 1
+    elif choice == ans[1]:
+        sel = 2
+    elif choice == ans[2]:
+        sel = 3
+    elif choice == ans[3]:
+        sel = 4
 
-# Check
-cols = st.columns(6)
-with cols[2]:
-    if st.button("Check"):
-        if sel == correct_choice:
-            st.success("Correct!")
-            if st.session_state.correct[st.session_state.index] != 0:
-                st.session_state.correct[st.session_state.index] = 1
-        else:
-            st.error("Wrong")
-            st.session_state.correct[st.session_state.index] = 0
+    # Check
+    cols = st.columns(6)
+    with cols[2]:
+        if st.button("Check"):
+            if sel == correct_choice:
+                st.success("Correct!")
+                if st.session_state.correct[st.session_state.index] != 0:
+                    st.session_state.correct[st.session_state.index] = 1
+            else:
+                st.error("Try again!")
+                st.session_state.correct[st.session_state.index] = 0
+
+if st.session_state.retry:
+    quiz(df[st.session_state.correct == 0])
+else:
+    quiz(df)
 
 # Display progress
 num_wrong = (st.session_state.correct == 0).sum()
@@ -88,7 +96,6 @@ prog = pd.DataFrame({
 
 st.write("### Progess")
 
-# Plotly
 prog = pd.DataFrame({
     "value": [num_correct, num_wrong, num_unanswered],
     "label": ["correct", "wrong", "unanswered"],
@@ -114,6 +121,17 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
 
 st.plotly_chart(fig)
 
+# Re-try failed tests
+if num_wrong > 0:
+    col1, col2 = st.columns(2)
+    with col1:
+        retry = st.selectbox('Practice mode', ["All questions", "Re-try wrong questions"])
+        if retry == "Re-try wrong questions":
+            st.session_state.retry = True
+    with col2:
+        st.write("")
+        st.write("")
+        reload = st.button("Choose")
 
 # Signature
 st.write("")
@@ -123,5 +141,8 @@ urlrGH = "[Github](https://github.com/rubenrossbach)"
 st.write("Made by Ruben Rossbach")
 st.write(f"{urlrLink} | {urlrGH}")
 
+# fix index/ session state during retry
 
-# Add retry of failed tests
+# enable correcting progress during retry
+
+# Turn on dark theme
