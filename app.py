@@ -73,16 +73,14 @@ def quiz(df):
         if st.button("Check"):
             if sel == correct_choice:
                 st.success("Correct!")
-                if st.session_state.correct[st.session_state.index] != 0:
+                if (st.session_state.correct[st.session_state.index] != 0) \
+                    | (st.session_state.retry == True):
                     st.session_state.correct[st.session_state.index] = 1
             else:
                 st.error("Try again!")
                 st.session_state.correct[st.session_state.index] = 0
 
-if st.session_state.retry:
-    quiz(df[st.session_state.correct == 0])
-else:
-    quiz(df)
+quiz(df)
 
 # Display progress
 num_wrong = (st.session_state.correct == 0).sum()
@@ -121,17 +119,34 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
 
 st.plotly_chart(fig)
 
+# Save and load progress
+# csv = pd.DataFrame(st.session_state.correct).to_csv(index=False)
+# col1, col2 = st.columns(2)
+# with col1:
+#     st.download_button(
+#         label="Save Progress",
+#         data=csv,
+#         file_name='ML_Quiz_Progress.csv',
+#         mime='text/csv',
+#     )
+# with col2:
+#     if st.button("Load Progress"):
+#         uploaded_file = st.file_uploader("Load Progress", type="csv")
+#         if uploaded_file is not None:
+#             arr = np.genfromtxt(uploaded_file, delimiter=",")
+#         #     st.session_state.new_correct = arr
+
 # Re-try failed tests
 if num_wrong > 0:
     col1, col2 = st.columns(2)
     with col1:
-        retry = st.selectbox('Practice mode', ["All questions", "Re-try wrong questions"])
-        if retry == "Re-try wrong questions":
-            st.session_state.retry = True
+        retry_index = st.selectbox('Re-try questions', df[st.session_state.correct == 0].index + 1)
+        st.session_state.index = retry_index - 1
     with col2:
         st.write("")
         st.write("")
-        reload = st.button("Choose")
+        if st.button("Retry"):
+            st.session_state.retry = True
 
 # Signature
 st.write("")
@@ -141,8 +156,6 @@ urlrGH = "[Github](https://github.com/rubenrossbach)"
 st.write("Made by Ruben Rossbach")
 st.write(f"{urlrLink} | {urlrGH}")
 
-# fix index/ session state during retry
-
-# enable correcting progress during retry
+# load progress
 
 # Turn on dark theme
