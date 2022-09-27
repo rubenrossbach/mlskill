@@ -46,7 +46,7 @@ def quiz(df):
             st.session_state.index += 1
 
     # Display question and answers
-    st.write(df.iloc[st.session_state.index, 0])
+    st.write(f"##### {df.iloc[st.session_state.index, 0]}")
 
     try:
         st.image(df.iloc[st.session_state.index, 6])
@@ -92,7 +92,7 @@ prog = pd.DataFrame({
     "unanswered": num_unanswered
     }, index=[0])
 
-st.write("### Progess")
+st.write("#### Progess")
 
 prog = pd.DataFrame({
     "value": [num_correct, num_wrong, num_unanswered],
@@ -119,34 +119,45 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
 
 st.plotly_chart(fig)
 
-# Save and load progress
-# csv = pd.DataFrame(st.session_state.correct).to_csv(index=False)
-# col1, col2 = st.columns(2)
-# with col1:
-#     st.download_button(
-#         label="Save Progress",
-#         data=csv,
-#         file_name='ML_Quiz_Progress.csv',
-#         mime='text/csv',
-#     )
-# with col2:
-#     if st.button("Load Progress"):
-#         uploaded_file = st.file_uploader("Load Progress", type="csv")
-#         if uploaded_file is not None:
-#             arr = np.genfromtxt(uploaded_file, delimiter=",")
-#         #     st.session_state.new_correct = arr
-
 # Re-try failed tests
 if num_wrong > 0:
     col1, col2 = st.columns(2)
     with col1:
-        retry_index = st.selectbox('Re-try questions', df[st.session_state.correct == 0].index + 1)
-        st.session_state.index = retry_index - 1
+        retry_index = st.selectbox('Retry failed questions', df[st.session_state.correct == 0].index + 1)
     with col2:
         st.write("")
         st.write("")
-        if st.button("Retry"):
+        if st.button("Retry (click twice)!"):
+            st.session_state.index = retry_index - 1
             st.session_state.retry = True
+
+# Save and load progress
+st.write("")
+st.write("")
+if st.checkbox("Save/ Load Progress"):
+    csv = pd.DataFrame(st.session_state.correct).to_csv(index=False)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("Save Progress File")
+        st.download_button(
+            label="Download",
+            data=csv,
+            file_name='ML_Quiz_Progress.csv',
+            mime='text/csv',
+            )
+    with col2:
+        uploaded_file = st.file_uploader("Load Progress File", type="csv")
+        if uploaded_file is not None:
+            try:
+                arr = np.genfromtxt(uploaded_file, delimiter=",")[1:]
+                if arr.shape == (len(df),):
+                    st.session_state.correct[:] = arr[:]
+                    del arr, uploaded_file
+                else:
+                    raise
+            except:
+                st.warning(f"Choose an array of shape ({len(df)},)")
+            apply = st.button("Confirm loading progress")
 
 # Signature
 st.write("")
@@ -156,6 +167,4 @@ urlrGH = "[Github](https://github.com/rubenrossbach)"
 st.write("Made by Ruben Rossbach")
 st.write(f"{urlrLink} | {urlrGH}")
 
-# load progress
-
-# Turn on dark theme
+# fix error when retry mode
