@@ -17,4 +17,4 @@ pytest
 yapf
 
 # website
-streamlit==1.8
+streamlit
