@@ -9,12 +9,5 @@ numpy
 pandas
 plotly
 
-# tests/linter
-black
-coverage
-flake8
-pytest
-yapf
-
 # website
-streamlit
+streamlit==1.5.1
