@@ -8,13 +8,21 @@ st.set_page_config(
     page_icon="chart_with_upwards_trend",
     layout="centered")
 
+st.markdown("""
+<style>
+div.row-widget.stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
+    background-color: #3f5ca6;
+}
+</style>""", unsafe_allow_html=True)
+
+st.write("# Machine Learning Skill Test")
+
+# Get data
 @st.cache
 def get_data():
     return pd.read_csv("data/results.csv")
 
 df = get_data()
-
-st.write("# Machine Learning Skill Test")
 
 # Session state
 if "index" not in st.session_state:
@@ -23,29 +31,40 @@ if "correct" not in st.session_state:
     st.session_state.correct = np.array([np.nan] * len(df))
 if "retry" not in st.session_state:
     st.session_state.retry = False
+if "upload" not in st.session_state:
+    st.session_state.upload = False
 
 def quiz(df):
     # Controls
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.write("")
         st.write("")
         if st.button("Back"):
             st.session_state.index -= 1
     with col2:
-        jump = st.selectbox('Jump to question', df.index + 1)
+        selection = st.radio("", ["All Questions", "Retry Q."], index=0)
+        if (selection == "Retry Q.") & ((st.session_state.correct == 0).sum() == 0):
+            st.warning("Click this to repeat failed questions")
     with col3:
+        if selection == "All Questions":
+            jump = st.selectbox('Jump to question', df.index + 1)
+        if selection == "Retry Q.":
+            st.session_state.retry = True
+            jump = st.selectbox('Jump to question', df[st.session_state.correct == 0].index + 1)
+    with col4:
         st.write("")
         st.write("")
         if st.button("Go"):
             st.session_state.index = jump - 1
-    with col4:
+    with col5:
         st.write("")
         st.write("")
         if st.button("Continue"):
             st.session_state.index += 1
 
     # Display question and answers
+    st.write("")
     st.write(f"##### {df.iloc[st.session_state.index, 0]}")
 
     try:
@@ -105,7 +124,7 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
              hover_name="value", hover_data={"y": False},
              height=180, color_discrete_map={
                  "wrong": "#FF6666",
-                 "correct": "#00FF00",
+                 "correct": "#66ff66",
                  "unanswered": "#C0C0C0"})\
                      .update_layout(legend={"orientation": "h",
                                             "title": "",
@@ -119,26 +138,12 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
 
 st.plotly_chart(fig)
 
-# Re-try failed tests
-if num_wrong > 0:
-    col1, col2 = st.columns(2)
-    with col1:
-        retry_index = st.selectbox('Retry failed questions', df[st.session_state.correct == 0].index + 1)
-    with col2:
-        st.write("")
-        st.write("")
-        if st.button("Retry (click twice)!"):
-            st.session_state.index = retry_index - 1
-            st.session_state.retry = True
-
 # Save and load progress
-st.write("")
-st.write("")
 if st.checkbox("Save/ Load Progress"):
     csv = pd.DataFrame(st.session_state.correct).to_csv(index=False)
     col1, col2 = st.columns(2)
     with col1:
-        st.write("Save Progress File")
+        st.write("Save progress file")
         st.download_button(
             label="Download",
             data=csv,
@@ -146,18 +151,20 @@ if st.checkbox("Save/ Load Progress"):
             mime='text/csv',
             )
     with col2:
-        uploaded_file = st.file_uploader("Load Progress File", type="csv")
-        if uploaded_file is not None:
+        uploaded_file = st.file_uploader("Load progress file", type="csv")
+        if (uploaded_file is not None) & (st.session_state.upload == False):
             try:
                 arr = np.genfromtxt(uploaded_file, delimiter=",")[1:]
                 if arr.shape == (len(df),):
                     st.session_state.correct[:] = arr[:]
-                    del arr, uploaded_file
+                    st.session_state.upload = True
                 else:
                     raise
             except:
                 st.warning(f"Choose an array of shape ({len(df)},)")
             apply = st.button("Confirm loading progress")
+        if uploaded_file is None:
+            st.session_state.upload = False
 
 # Signature
 st.write("")
@@ -166,5 +173,3 @@ urlrLink = "[LinkedIn](https://www.linkedin.com/in/ruben-rossbach/)"
 urlrGH = "[Github](https://github.com/rubenrossbach)"
 st.write("Made by Ruben Rossbach")
 st.write(f"{urlrLink} | {urlrGH}")
-
-# fix error when retry mode
