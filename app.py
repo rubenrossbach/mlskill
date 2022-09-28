@@ -36,20 +36,20 @@ if "upload" not in st.session_state:
 
 def quiz(df):
     # Controls
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5 = st.columns([1,1.2,1,1,1])
     with col1:
         st.write("")
         st.write("")
         if st.button("Back"):
             st.session_state.index -= 1
     with col2:
-        selection = st.radio("", ["All Questions", "Retry Q."], index=0)
-        if (selection == "Retry Q.") & ((st.session_state.correct == 0).sum() == 0):
+        selection = st.radio("", ["All Questions", "Retry Questions"], index=0)
+        if (selection == "Retry Questions") & ((st.session_state.correct == 0).sum() == 0):
             st.warning("Click this to repeat failed questions")
     with col3:
         if selection == "All Questions":
             jump = st.selectbox('Jump to question', df.index + 1)
-        if selection == "Retry Q.":
+        if selection == "Retry Questions":
             st.session_state.retry = True
             jump = st.selectbox('Jump to question', df[st.session_state.correct == 0].index + 1)
     with col4:
