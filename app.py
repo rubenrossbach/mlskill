@@ -48,6 +48,7 @@ def quiz(df):
             st.warning("Click this to repeat failed questions")
     with col3:
         if selection == "All Questions":
+            st.session_state.retry = False
             jump = st.selectbox('Jump to question', df.index + 1)
         if selection == "Retry Questions":
             st.session_state.retry = True
