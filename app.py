@@ -33,6 +33,8 @@ if "retry" not in st.session_state:
     st.session_state.retry = False
 if "upload" not in st.session_state:
     st.session_state.upload = False
+if "finished" not in st.session_state:
+    st.session_state.finished = False
 
 def quiz(df):
     # Controls
@@ -146,10 +148,12 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
 
 st.plotly_chart(fig)
 
-# Finish animation
+# Finish animation: show balloons only once upon finishing
 if num_correct == len(df):
     st.success("##### Congratulations! You completed all questions!")
-    st.balloons()
+    if not st.session_state.finished:
+        st.balloons()
+        st.session_state.finished = True
 
 # Save and load progress
 if st.checkbox("Save/ Load Progress"):
@@ -171,7 +175,7 @@ if st.checkbox("Save/ Load Progress"):
                 if arr.shape == (len(df),):
                     st.session_state.correct[:] = arr[:]
                     st.session_state.upload = True
-                    # calculate session state
+                    # session state: first unanswered question
                     for i in range(len(arr)):
                         if arr[i] not in [0,1]:
                             break
