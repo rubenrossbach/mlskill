@@ -160,6 +160,11 @@ if st.checkbox("Save/ Load Progress"):
                 if arr.shape == (len(df),):
                     st.session_state.correct[:] = arr[:]
                     st.session_state.upload = True
+                    # calculate session state
+                    for i in range(len(arr)):
+                        if arr[i] not in [0,1]:
+                            break
+                    st.session_state.index = i
                 else:
                     raise
             except:
