@@ -41,7 +41,10 @@ def quiz(df):
         st.write("")
         st.write("")
         if st.button("Back"):
-            st.session_state.index -= 1
+            if st.session_state.index != 0:
+                st.session_state.index -= 1
+            else:
+                st.session_state.index = 95
     with col2:
         selection = st.radio("", ["All Questions", "Retry Questions"], index=0)
     with col3:
@@ -60,7 +63,10 @@ def quiz(df):
         st.write("")
         st.write("")
         if st.button("Continue"):
-            st.session_state.index += 1
+            if st.session_state.index != 95:
+                st.session_state.index += 1
+            else:
+                st.session_state.index = 0
     if st.session_state.retry:
         st.info("Retry mode: repeat failed questions and correct mistakes")
 
