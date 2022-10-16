@@ -146,6 +146,11 @@ fig = px.bar(prog, x="value", y="y", color='label', orientation='h',
 
 st.plotly_chart(fig)
 
+# Finish animation
+if num_correct == len(df):
+    st.success("##### Congratulations! You completed all questions!")
+    st.balloons()
+
 # Save and load progress
 if st.checkbox("Save/ Load Progress"):
     csv = pd.DataFrame(st.session_state.correct).to_csv(index=False)
