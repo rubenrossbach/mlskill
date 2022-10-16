@@ -121,7 +121,7 @@ prog = pd.DataFrame({
     "unanswered": num_unanswered
     }, index=[0])
 
-st.write("#### Progess")
+st.write("#### Progress")
 
 prog = pd.DataFrame({
     "value": [num_correct, num_wrong, num_unanswered],
